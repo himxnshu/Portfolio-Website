@@ -1,11 +1,23 @@
 (() => {
   'use strict';
 
+  // =========================================================================
+  // 1. Photo Scroll Animation Configuration (240-Frame Canvas Sequence)
+  // =========================================================================
+  const TOTAL_FRAMES = 240;
+  const FRAME_PREFIX = 'Frames/frame_';
+  const FRAME_EXTENSION = '.png';
+  const LERP_FACTOR = 0.095; // Fluid lerp factor for smooth cinematic scrub
+
   // DOM Elements
   const canvas = document.getElementById('animation-canvas');
   let ctx = null;
   if (canvas) {
-    ctx = canvas.getContext('2d');
+    ctx = canvas.getContext('2d', { alpha: false });
+    if (ctx) {
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+    }
   }
 
   const loader = document.getElementById('loader');
@@ -20,177 +32,92 @@
   const drawerBackdrop = document.getElementById('drawer-backdrop');
   const drawerLinks = document.querySelectorAll('.d-link');
 
-  // =========================================================================
-  // 1. Snappy Zero-Lag Preloader (Smooth 300ms Startup)
-  // =========================================================================
-  function runSnappyLoader() {
-    let progress = 0;
-    const startTime = performance.now();
-    const duration = 280; // 280ms total snappy intro
+  // Photo Animation State
+  const images = new Array(TOTAL_FRAMES);
+  let loadedCount = 0;
+  let currentFrame = 0;
+  let targetFrame = 0;
+  let lastRenderedFrame = -1;
+  let isInitialFrameRendered = false;
+  let isPageUnlocked = false;
 
-    function step(currentTime) {
-      const elapsed = currentTime - startTime;
-      progress = Math.min(100, Math.round((elapsed / duration) * 100));
-
-      if (progressFill) progressFill.style.width = `${progress}%`;
-      if (progressText) progressText.textContent = `${progress}%`;
-
-      if (progress < 100) {
-        requestAnimationFrame(step);
-      } else {
-        setTimeout(() => {
-          if (loader) loader.classList.add('loaded');
-        }, 120);
-      }
-    }
-
-    requestAnimationFrame(step);
+  function getFramePath(index) {
+    const padded = String(index + 1).padStart(4, '0');
+    return `${FRAME_PREFIX}${padded}${FRAME_EXTENSION}`;
   }
 
-  // =========================================================================
-  // 2. High-Performance Hardware-Accelerated Ambient Canvas
-  // =========================================================================
-  let particles = [];
-  let mouse = { x: null, y: null, targetX: null, targetY: null };
-  let scrollProgress = 0;
-  let animId = null;
-
-  class AmbientParticle {
-    constructor(w, h) {
-      this.reset(w, h);
+  // Find nearest loaded frame to ensure 100% fluid scrub with zero blank flicker
+  function getNearestLoadedFrame(targetIdx) {
+    if (images[targetIdx] && images[targetIdx].isReady) {
+      return images[targetIdx];
     }
-
-    reset(w, h) {
-      this.x = Math.random() * w;
-      this.y = Math.random() * h;
-      this.baseRadius = Math.random() * 2 + 0.8;
-      this.radius = this.baseRadius;
-      this.vx = (Math.random() - 0.5) * 0.45;
-      this.vy = (Math.random() - 0.5) * 0.45;
-      this.alpha = Math.random() * 0.45 + 0.15;
-      // Signature accents: Vibrant Orange, Warm Amber, Cyan AI glow
-      const colors = ['255, 87, 34', '255, 171, 0', '0, 210, 255', '255, 255, 255'];
-      this.color = colors[Math.floor(Math.random() * colors.length)];
-      this.pulseSpeed = Math.random() * 0.02 + 0.008;
-      this.pulseVal = Math.random() * Math.PI;
-    }
-
-    update(w, h, scrollDelta) {
-      this.x += this.vx;
-      this.y += this.vy + scrollDelta * 0.4;
-
-      this.pulseVal += this.pulseSpeed;
-      this.radius = this.baseRadius + Math.sin(this.pulseVal) * 0.6;
-
-      // Mouse subtle repulsion
-      if (mouse.x !== null && mouse.y !== null) {
-        const dx = mouse.x - this.x;
-        const dy = mouse.y - this.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 120) {
-          const force = (120 - dist) / 120;
-          this.x -= (dx / dist) * force * 1.5;
-          this.y -= (dy / dist) * force * 1.5;
+    let closest = null;
+    let minDistance = Infinity;
+    for (let i = 0; i < TOTAL_FRAMES; i++) {
+      if (images[i] && images[i].isReady) {
+        const dist = Math.abs(i - targetIdx);
+        if (dist < minDistance) {
+          minDistance = dist;
+          closest = images[i];
         }
       }
-
-      // Wrap edges
-      if (this.x < 0) this.x = w;
-      if (this.x > w) this.x = 0;
-      if (this.y < 0) this.y = h;
-      if (this.y > h) this.y = 0;
     }
-
-    draw(ctx) {
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, Math.max(0.2, this.radius), 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${this.color}, ${this.alpha})`;
-      ctx.shadowColor = `rgba(${this.color}, 0.5)`;
-      ctx.shadowBlur = 8;
-      ctx.fill();
-      ctx.shadowBlur = 0;
-    }
+    return closest;
   }
 
-  function initAmbientCanvas() {
+  // Draw image on canvas preserving cover aspect ratio with high sharpness
+  function renderFrame(frameIndex) {
     if (!canvas || !ctx) return;
+    const boundedIndex = Math.max(0, Math.min(TOTAL_FRAMES - 1, frameIndex));
+    const img = getNearestLoadedFrame(boundedIndex);
+    if (!img) return;
 
-    function resize() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.style.height = `${window.innerHeight}px`;
-      ctx.scale(dpr, dpr);
+    const canvasW = canvas.width;
+    const canvasH = canvas.height;
+    const imgW = img.naturalWidth || 1920;
+    const imgH = img.naturalHeight || 1080;
 
-      // Populate particles
-      const count = window.innerWidth < 768 ? 28 : 55;
-      particles = [];
-      for (let i = 0; i < count; i++) {
-        particles.push(new AmbientParticle(window.innerWidth, window.innerHeight));
-      }
-    }
+    // Cover math
+    const scale = Math.max(canvasW / imgW, canvasH / imgH);
+    const drawW = imgW * scale;
+    const drawH = imgH * scale;
 
-    resize();
-    window.addEventListener('resize', resize, { passive: true });
+    const drawX = (canvasW - drawW) / 2;
+    const drawY = (canvasH - drawH) / 2;
 
-    window.addEventListener('mousemove', (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-    }, { passive: true });
-
-    window.addEventListener('mouseleave', () => {
-      mouse.x = null;
-      mouse.y = null;
-    });
-
-    let lastScrollY = window.scrollY || 0;
-    let scrollDelta = 0;
-
-    function renderLoop() {
-      const currentScrollY = window.scrollY || 0;
-      scrollDelta = (currentScrollY - lastScrollY) * 0.15;
-      lastScrollY = currentScrollY;
-
-      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-
-      // Draw faint interconnecting constellation lines
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 110) {
-            const lineAlpha = (1 - dist / 110) * 0.12;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(255, 87, 34, ${lineAlpha})`;
-            ctx.lineWidth = 0.75;
-            ctx.stroke();
-          }
-        }
-      }
-
-      // Draw particles
-      for (let i = 0; i < particles.length; i++) {
-        particles[i].update(w, h, scrollDelta);
-        particles[i].draw(ctx);
-      }
-
-      animId = requestAnimationFrame(renderLoop);
-    }
-
-    renderLoop();
+    ctx.drawImage(img, 0, 0, imgW, imgH, drawX, drawY, drawW, drawH);
+    lastRenderedFrame = boundedIndex;
   }
 
-  // =========================================================================
-  // 3. Scroll & Navbar States
-  // =========================================================================
+  // Canvas resize with device pixel ratio scaling
+  function handleResize() {
+    if (!canvas) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const displayW = window.innerWidth;
+    const displayH = window.innerHeight;
+
+    const pixelW = Math.round(displayW * dpr);
+    const pixelH = Math.round(displayH * dpr);
+
+    if (canvas.width !== pixelW || canvas.height !== pixelH) {
+      canvas.width = pixelW;
+      canvas.height = pixelH;
+    }
+
+    if (isInitialFrameRendered) {
+      renderFrame(Math.round(currentFrame));
+    }
+  }
+
+  // Update target frame and navbar state based on window scroll
   function updateScroll() {
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    if (maxScroll > 0) {
+      const scrollY = Math.max(0, Math.min(maxScroll, window.scrollY || window.pageYOffset));
+      const progress = scrollY / maxScroll;
+      targetFrame = progress * (TOTAL_FRAMES - 1);
+    }
+
     if (globalNavbar) {
       if (window.scrollY > 40) {
         globalNavbar.classList.add('scrolled');
@@ -200,8 +127,248 @@
     }
   }
 
+  // Smooth Lerp Photo Animation Loop (Runs at native 60/120fps)
+  function animationLoop() {
+    const diff = targetFrame - currentFrame;
+    if (Math.abs(diff) > 0.0005) {
+      currentFrame += diff * LERP_FACTOR;
+    } else {
+      currentFrame = targetFrame;
+    }
+
+    const frameToRender = Math.round(currentFrame);
+    if (frameToRender !== lastRenderedFrame) {
+      renderFrame(frameToRender);
+    }
+
+    requestAnimationFrame(animationLoop);
+  }
+
+  // Dismiss loader cleanly
+  function unlockPage() {
+    if (isPageUnlocked) return;
+    isPageUnlocked = true;
+    if (progressFill) progressFill.style.width = '100%';
+    if (progressText) progressText.textContent = '100%';
+    setTimeout(() => {
+      if (loader) loader.classList.add('loaded');
+    }, 180);
+  }
+
+  // Preload frames progressively so initial view loads immediately without freezing
+  function preloadFrames() {
+    // 1. High priority: Load frame 0 immediately and display it
+    const firstImg = new Image();
+    firstImg.onload = () => {
+      firstImg.isReady = true;
+      images[0] = firstImg;
+      loadedCount++;
+      renderFrame(0);
+      isInitialFrameRendered = true;
+      unlockPage(); // Instantly show page once first frame is ready!
+    };
+    firstImg.onerror = () => {
+      unlockPage();
+    };
+    firstImg.src = getFramePath(0);
+
+    // Fallback timer ensures page is unlocked within 400ms max
+    setTimeout(() => unlockPage(), 400);
+
+    // 2. Load keyframes first (every 4th frame) to give instant responsive scrub across entire scroll
+    const keyframeIndices = [];
+    for (let i = 4; i < TOTAL_FRAMES; i += 4) {
+      keyframeIndices.push(i);
+    }
+    // Then fill in the rest
+    for (let i = 1; i < TOTAL_FRAMES; i++) {
+      if (i % 4 !== 0) keyframeIndices.push(i);
+    }
+
+    // Load sequentially in small batches to preserve network and CPU
+    let batchIndex = 0;
+    const BATCH_SIZE = 6;
+
+    function loadNextBatch() {
+      if (batchIndex >= keyframeIndices.length) return;
+      const end = Math.min(batchIndex + BATCH_SIZE, keyframeIndices.length);
+
+      for (let k = batchIndex; k < end; k++) {
+        const frameIdx = keyframeIndices[k];
+        const img = new Image();
+        img.onload = () => {
+          img.isReady = true;
+          images[frameIdx] = img;
+          loadedCount++;
+        };
+        img.onerror = () => {
+          loadedCount++;
+        };
+        img.src = getFramePath(frameIdx);
+      }
+
+      batchIndex = end;
+      if (batchIndex < keyframeIndices.length) {
+        setTimeout(loadNextBatch, 25);
+      }
+    }
+
+    // Start background loading
+    setTimeout(loadNextBatch, 50);
+  }
+
   // =========================================================================
-  // 4. Setup UI Interactions
+  // 2. Sideways Projects Carousel Interactions (Guaranteed Never Stop in Between)
+  // =========================================================================
+  function setupProjectsCarousel() {
+    const track = document.getElementById('projects-track');
+    const prevBtn = document.getElementById('projects-prev-btn');
+    const nextBtn = document.getElementById('projects-next-btn');
+    const counter = document.getElementById('projects-counter');
+
+    if (!track) return;
+    const cards = Array.from(track.querySelectorAll('.project-carousel-card'));
+    const totalCards = cards.length;
+    if (totalCards === 0) return;
+
+    let activeIndex = 0;
+
+    // Exact card snapping function — prevents stopping in between cards!
+    function goToCard(index, smooth = true) {
+      activeIndex = Math.max(0, Math.min(totalCards - 1, index));
+      const targetCard = cards[activeIndex];
+      if (targetCard) {
+        const targetScroll = targetCard.offsetLeft - track.offsetLeft;
+        track.scrollTo({
+          left: targetScroll,
+          behavior: smooth ? 'smooth' : 'auto'
+        });
+      }
+      updateCounterDisplay(activeIndex);
+    }
+
+    function updateCounterDisplay(index) {
+      if (!counter) return;
+      const padCurrent = String(index + 1).padStart(2, '0');
+      const padTotal = String(totalCards).padStart(2, '0');
+      counter.textContent = `${padCurrent} / ${padTotal}`;
+
+      // Update button visual states
+      if (prevBtn) {
+        prevBtn.style.opacity = index === 0 ? '0.45' : '1';
+        prevBtn.style.pointerEvents = index === 0 ? 'none' : 'auto';
+      }
+      if (nextBtn) {
+        nextBtn.style.opacity = index === totalCards - 1 ? '0.45' : '1';
+        nextBtn.style.pointerEvents = index === totalCards - 1 ? 'none' : 'auto';
+      }
+    }
+
+    // Previous & Next Arrow Clicks
+    if (prevBtn) {
+      prevBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        goToCard(activeIndex - 1);
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        goToCard(activeIndex + 1);
+      });
+    }
+
+    // Scroll listener to sync active index and counter
+    let scrollTimeout = null;
+    track.addEventListener('scroll', () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        const currentScroll = track.scrollLeft;
+        let closestIndex = 0;
+        let minDiff = Infinity;
+
+        cards.forEach((card, idx) => {
+          const cardLeft = card.offsetLeft - track.offsetLeft;
+          const diff = Math.abs(cardLeft - currentScroll);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestIndex = idx;
+          }
+        });
+
+        activeIndex = closestIndex;
+        updateCounterDisplay(activeIndex);
+      }, 60);
+    }, { passive: true });
+
+    // Mouse Drag-to-Scroll UX with Automatic Snap to Nearest Card
+    let isDown = false;
+    let startX = 0;
+    let scrollLeftPos = 0;
+    let hasDragged = false;
+
+    track.addEventListener('mousedown', (e) => {
+      if (e.target.closest('a') || e.target.closest('button')) return;
+      isDown = true;
+      hasDragged = false;
+      track.classList.add('grabbing');
+      startX = e.pageX - track.offsetLeft;
+      scrollLeftPos = track.scrollLeft;
+    });
+
+    function finishDrag() {
+      if (!isDown) return;
+      isDown = false;
+      track.classList.remove('grabbing');
+
+      // Snap to nearest card so it NEVER stops in between!
+      if (hasDragged) {
+        const currentScroll = track.scrollLeft;
+        let closestIndex = 0;
+        let minDiff = Infinity;
+
+        cards.forEach((card, idx) => {
+          const cardLeft = card.offsetLeft - track.offsetLeft;
+          const diff = Math.abs(cardLeft - currentScroll);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestIndex = idx;
+          }
+        });
+
+        goToCard(closestIndex, true);
+      }
+    }
+
+    window.addEventListener('mouseup', finishDrag);
+    track.addEventListener('mouseleave', finishDrag);
+
+    track.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      hasDragged = true;
+      const x = e.pageX - track.offsetLeft;
+      const walk = (x - startX) * 1.35;
+      track.scrollLeft = scrollLeftPos - walk;
+    });
+
+    // Horizontal wheel / trackpad swipe handling:
+    // Only intercepts when user is intentionally scrolling horizontally (Shift + Wheel or trackpad deltaX)
+    // NEVER blocks normal vertical scrolling so the page NEVER gets stuck!
+    track.addEventListener('wheel', (e) => {
+      if (e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        // Natural horizontal swipe
+        track.scrollLeft += e.deltaX || e.deltaY;
+      }
+    }, { passive: true });
+
+    // Initialize with first card
+    updateCounterDisplay(0);
+  }
+
+  // =========================================================================
+  // 3. Setup General UI Interactions & Navigation
   // =========================================================================
   function setupInteractions() {
     // Smooth scrolling for all internal anchor links
@@ -245,107 +412,22 @@
 
     // Active scroll listener
     window.addEventListener('scroll', updateScroll, { passive: true });
+    window.addEventListener('wheel', updateScroll, { passive: true });
 
-    // =========================================================================
-    // 5. Sideways Projects Carousel Interactions
-    // =========================================================================
-    const projectsTrack = document.getElementById('projects-track');
-    const projectsPrevBtn = document.getElementById('projects-prev-btn');
-    const projectsNextBtn = document.getElementById('projects-next-btn');
-    const projectsCounter = document.getElementById('projects-counter');
-
-    if (projectsTrack) {
-      const cards = projectsTrack.querySelectorAll('.project-carousel-card');
-      const totalCards = cards.length;
-
-      function updateCounter() {
-        if (!projectsCounter || totalCards === 0) return;
-        const scrollLeft = projectsTrack.scrollLeft;
-        const cardWidth = cards[0] ? cards[0].offsetWidth + 28 : 568;
-        const currentIndex = Math.min(totalCards - 1, Math.max(0, Math.round(scrollLeft / cardWidth)));
-        const padCurrent = String(currentIndex + 1).padStart(2, '0');
-        const padTotal = String(totalCards).padStart(2, '0');
-        projectsCounter.textContent = `${padCurrent} / ${padTotal}`;
-      }
-
-      function scrollTrack(direction) {
-        const firstCard = cards[0];
-        const step = firstCard ? (firstCard.offsetWidth + 28) : 568;
-        projectsTrack.scrollBy({
-          left: direction === 'next' ? step : -step,
-          behavior: 'smooth'
-        });
-      }
-
-      if (projectsPrevBtn) {
-        projectsPrevBtn.addEventListener('click', () => scrollTrack('prev'));
-      }
-
-      if (projectsNextBtn) {
-        projectsNextBtn.addEventListener('click', () => scrollTrack('next'));
-      }
-
-      projectsTrack.addEventListener('scroll', updateCounter, { passive: true });
-
-      // Horizontal Wheel translation when hovering carousel
-      projectsTrack.addEventListener('wheel', (e) => {
-        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-          const maxScroll = projectsTrack.scrollWidth - projectsTrack.clientWidth;
-          if ((e.deltaY > 0 && projectsTrack.scrollLeft < maxScroll - 2) ||
-              (e.deltaY < 0 && projectsTrack.scrollLeft > 2)) {
-            e.preventDefault();
-            projectsTrack.scrollLeft += e.deltaY * 0.9;
-          }
-        }
-      }, { passive: false });
-
-      // Mouse Drag-to-Scroll UX
-      let isDown = false;
-      let startX = 0;
-      let scrollLeftPos = 0;
-
-      projectsTrack.addEventListener('mousedown', (e) => {
-        if (e.target.closest('a') || e.target.closest('button')) return;
-        isDown = true;
-        projectsTrack.classList.add('grabbing');
-        startX = e.pageX - projectsTrack.offsetLeft;
-        scrollLeftPos = projectsTrack.scrollLeft;
-      });
-
-      window.addEventListener('mouseup', () => {
-        if (isDown) {
-          isDown = false;
-          projectsTrack.classList.remove('grabbing');
-        }
-      });
-
-      projectsTrack.addEventListener('mouseleave', () => {
-        if (isDown) {
-          isDown = false;
-          projectsTrack.classList.remove('grabbing');
-        }
-      });
-
-      projectsTrack.addEventListener('mousemove', (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        const x = e.pageX - projectsTrack.offsetLeft;
-        const walk = (x - startX) * 1.5;
-        projectsTrack.scrollLeft = scrollLeftPos - walk;
-      });
-
-      updateCounter();
-    }
+    // Setup projects sideways carousel
+    setupProjectsCarousel();
   }
 
   // =========================================================================
-  // 6. Application Initialization
+  // 4. Initialize Application
   // =========================================================================
   function init() {
-    runSnappyLoader();
-    initAmbientCanvas();
+    handleResize();
+    window.addEventListener('resize', handleResize, { passive: true });
+
+    preloadFrames();
     setupInteractions();
-    updateScroll();
+    animationLoop();
   }
 
   if (document.readyState === 'loading') {
