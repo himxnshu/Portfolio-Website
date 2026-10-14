@@ -89,10 +89,10 @@
     lastRenderedFrame = boundedIndex;
   }
 
-  // Canvas resize with device pixel ratio scaling
+  // Canvas resize with device pixel ratio scaling (optimized for mobile & desktop)
   function handleResize() {
     if (!canvas) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.5 : 2);
     const displayW = window.innerWidth;
     const displayH = window.innerHeight;
 
@@ -362,9 +362,10 @@
       }
     });
 
-    // Active scroll listener
+    // Active scroll listener (desktop, wheel, and mobile touch)
     window.addEventListener('scroll', updateScroll, { passive: true });
     window.addEventListener('wheel', updateScroll, { passive: true });
+    window.addEventListener('touchmove', updateScroll, { passive: true });
 
     // Setup projects sideways carousel
     setupProjectsCarousel();

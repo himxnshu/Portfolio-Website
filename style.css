@@ -2103,6 +2103,8 @@ body {
 /* ==========================================================================
    RESPONSIVE DESIGN (LAPTOPS, TABLETS & SMARTPHONES)
    ========================================================================== */
+
+/* 1. Large Tablets & Small Laptops (max-width: 1200px) */
 @media (max-width: 1200px) {
   .hero-split-grid {
     grid-template-columns: 1fr;
@@ -2114,7 +2116,7 @@ body {
   }
 
   .white-editorial-card {
-    max-width: 650px;
+    max-width: 680px;
   }
 
   .skills-grid {
@@ -2128,15 +2130,20 @@ body {
   .contact-channels-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .project-carousel-card {
+    flex: 0 0 500px;
+  }
 }
 
-@media (max-width: 900px) {
+/* 2. Tablets (iPads, Android Tablets) (max-width: 992px) */
+@media (max-width: 992px) {
   .global-navbar {
-    padding: 16px 24px;
+    padding: 16px 28px;
   }
 
   .global-navbar.scrolled {
-    padding: 12px 24px;
+    padding: 12px 28px;
   }
 
   .desktop-nav {
@@ -2148,55 +2155,195 @@ body {
   }
 
   .section-hero {
-    padding: 100px 24px 60px 24px;
+    padding: 110px 28px 60px 28px;
+    min-height: auto;
   }
 
   .section-block {
-    padding: 80px 24px;
+    padding: 85px 28px;
+  }
+
+  .hero-giant-title {
+    font-size: clamp(3.8rem, 11vw, 5.8rem);
   }
 
   .about-grid {
     grid-template-columns: 1fr;
-  }
-
-  .certificates-card-grid {
-    grid-template-columns: 1fr;
+    gap: 32px;
   }
 
   .volunteering-dual-grid {
     grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .projects-header-flex {
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .project-carousel-card {
+    flex: 0 0 min(460px, 78vw);
+    padding: 30px 24px;
+  }
+
+  .contact-card-hero {
+    padding: 42px 30px;
+  }
+
+  .contact-huge-headline {
+    font-size: clamp(2.8rem, 8vw, 4.6rem);
+  }
+}
+
+/* 3. Small Tablets & Landscape Mobile (max-width: 768px) */
+@media (max-width: 768px) {
+  .certificates-card-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .skills-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .contact-channels-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .project-bullet-grid {
     grid-template-columns: 1fr;
   }
 
-  .projects-header-flex {
+  .header-with-action {
+    flex-direction: column;
     align-items: flex-start;
+    gap: 16px;
   }
 
-  .project-carousel-card {
-    flex: 0 0 460px;
-    padding: 32px 26px;
+  .linkedin-cert-all-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 20px;
   }
 
-  .contact-card-hero {
-    padding: 36px 28px;
-  }
-
-  .contact-channels-grid {
-    grid-template-columns: 1fr;
+  .scroll-down-hint {
+    display: none;
   }
 }
 
+/* 4. Smartphones (iPhone, Samsung, Pixel) (max-width: 640px) */
 @media (max-width: 640px) {
-  .hero-giant-title {
-    font-size: clamp(4.8rem, 18vw, 7.5rem);
+  .global-navbar {
+    padding: 12px 18px;
   }
 
+  .global-navbar.scrolled {
+    padding: 10px 18px;
+  }
+
+  .brand-logo-img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .brand-portfolio-title {
+    font-size: 1.35rem;
+    letter-spacing: 0.1em;
+  }
+
+  .nav-actions {
+    gap: 8px;
+  }
+
+  .icon-link {
+    width: 34px;
+    height: 34px;
+  }
+
+  .section-hero {
+    padding: 85px 16px 45px 16px;
+  }
+
+  .section-block {
+    padding: 60px 16px;
+  }
+
+  .section-header {
+    margin-bottom: 28px;
+  }
+
+  .section-num {
+    font-size: 0.72rem;
+    margin-bottom: 6px;
+  }
+
+  .section-title {
+    font-size: clamp(1.75rem, 7.5vw, 2.3rem);
+    line-height: 1.1;
+  }
+
+  .section-subtitle {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  /* Hero Elements */
+  .hero-giant-title {
+    font-size: clamp(3.2rem, 15vw, 5.2rem);
+    line-height: 0.88;
+    margin-bottom: 14px;
+  }
+
+  .hero-tagline-text {
+    font-size: 1.02rem;
+    line-height: 1.5;
+    margin-bottom: 22px;
+  }
+
+  .hero-cta-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .btn-view-work,
+  .btn-secondary-contact {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 24px;
+    font-size: 0.88rem;
+  }
+
+  .hero-resume-badge,
+  .gfg-hero-badge {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px 16px;
+    border-radius: 16px;
+    gap: 12px;
+  }
+
+  .resume-icon-box,
+  .gfg-icon-box {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+  }
+
+  .resume-badge-text,
+  .gfg-badge-text {
+    font-size: 0.82rem;
+  }
+
+  /* Hero White Card */
   .white-editorial-card {
-    padding: 30px 24px;
-    border-radius: 28px;
+    padding: 24px 18px;
+    border-radius: 24px;
+    gap: 20px;
   }
 
   .card-top-nav .card-nav-links {
@@ -2204,18 +2351,97 @@ body {
   }
 
   .status-main-headline {
-    font-size: 2.1rem;
+    font-size: clamp(1.65rem, 6vw, 2.1rem);
+    line-height: 1.15;
   }
 
-  .skills-grid {
-    grid-template-columns: 1fr;
+  .status-subtext {
+    font-size: 0.84rem;
+  }
+
+  .card-focus-box {
+    padding: 16px 14px;
+    border-radius: 16px;
+    gap: 10px;
+  }
+
+  .focus-tags {
+    gap: 6px;
+  }
+
+  .f-tag {
+    padding: 5px 10px;
+    font-size: 0.74rem;
+  }
+
+  .focus-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .card-ext-link {
+    width: 100%;
+    justify-content: center;
+    padding: 8px 14px;
+    font-size: 0.76rem;
+  }
+
+  /* Sideways Projects Carousel */
+  .projects-carousel-track {
+    gap: 14px;
+    padding: 10px 0 20px 0;
+    scroll-padding: 0 4px;
   }
 
   .project-carousel-card {
-    flex: 0 0 86vw;
-    min-width: 275px;
-    padding: 26px 20px;
-    border-radius: 22px;
+    flex: 0 0 calc(100vw - 32px);
+    max-width: calc(100vw - 32px);
+    min-width: 260px;
+    padding: 22px 16px;
+    border-radius: 20px;
+    gap: 16px;
+  }
+
+  .project-title {
+    font-size: 1.45rem;
+    line-height: 1.25;
+    margin: 4px 0 8px 0;
+  }
+
+  .project-summary {
+    font-size: 0.88rem;
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+
+  .project-bullet-grid {
+    padding: 12px 14px;
+    gap: 8px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+  }
+
+  .bullet-item {
+    font-size: 0.82rem;
+    line-height: 1.4;
+    gap: 8px;
+  }
+
+  .bullet-dot {
+    width: 5px;
+    height: 5px;
+    margin-top: 6px;
+  }
+
+  .t-tag {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+
+  .github-action-btn {
+    padding: 6px 14px;
+    font-size: 0.74rem;
   }
 
   .carousel-control-group {
@@ -2229,21 +2455,131 @@ body {
   }
 
   .carousel-arrow-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* About Section Cards */
+  .about-text-card {
+    padding: 24px 18px;
+    border-radius: 20px;
+    gap: 16px;
+  }
+
+  .about-p-lead {
+    font-size: 0.95rem;
+  }
+
+  .about-highlights-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* Certificates */
+  .cert-card-item {
+    padding: 22px 16px;
+    border-radius: 18px;
+    gap: 14px;
+  }
+
+  .cert-avatar-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.3rem;
+  }
+
+  .cert-title {
+    font-size: 1.15rem;
+  }
+
+  .cert-desc {
+    font-size: 0.84rem;
+  }
+
+  /* Volunteering */
+  .volunteer-card {
+    padding: 22px 16px;
+    border-radius: 18px;
+    gap: 12px;
+  }
+
+  .vol-org-title {
+    font-size: 1.2rem;
+  }
+
+  .vol-main-desc {
+    font-size: 0.88rem;
+  }
+
+  /* Contact */
+  .contact-card-hero {
+    padding: 28px 16px;
+    border-radius: 22px;
+    gap: 28px;
+  }
+
+  .contact-huge-headline {
+    font-size: clamp(2.2rem, 9.5vw, 3.4rem);
+    line-height: 0.95;
+    margin-bottom: 12px;
+  }
+
+  .contact-lead-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .contact-channel-card {
+    padding: 14px 14px;
+    border-radius: 14px;
+    gap: 12px;
+  }
+
+  .channel-icon {
     width: 38px;
     height: 38px;
+    border-radius: 10px;
   }
 
-  .about-text-card {
+  .channel-value {
+    font-size: 0.82rem;
+  }
+
+  /* Navigation Drawer */
+  .drawer-modal-panel {
+    width: min(320px, 88vw);
     padding: 28px 20px;
+    overflow-y: auto;
   }
 
-  .scroll-down-hint {
-    display: none;
+  .drawer-name {
+    font-size: 1.5rem;
+  }
+
+  .d-link {
+    font-size: 1.1rem;
   }
 
   .site-sub-footer {
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
     text-align: center;
+    padding-top: 20px;
+  }
+}
+
+/* 5. Ultra-compact devices (max-width: 380px) */
+@media (max-width: 380px) {
+  .hero-giant-title {
+    font-size: 3rem;
+  }
+
+  .status-main-headline {
+    font-size: 1.55rem;
+  }
+
+  .btn-view-work {
+    padding: 12px 16px;
+    font-size: 0.82rem;
   }
 }
