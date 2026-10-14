@@ -302,56 +302,8 @@
       }, 60);
     }, { passive: true });
 
-    // Mouse Drag-to-Scroll UX with Automatic Snap to Nearest Card
-    let isDown = false;
-    let startX = 0;
-    let scrollLeftPos = 0;
-    let hasDragged = false;
-
-    track.addEventListener('mousedown', (e) => {
-      if (e.target.closest('a') || e.target.closest('button')) return;
-      isDown = true;
-      hasDragged = false;
-      track.classList.add('grabbing');
-      startX = e.pageX - track.offsetLeft;
-      scrollLeftPos = track.scrollLeft;
-    });
-
-    function finishDrag() {
-      if (!isDown) return;
-      isDown = false;
-      track.classList.remove('grabbing');
-
-      // Snap to nearest card so it NEVER stops in between!
-      if (hasDragged) {
-        const currentScroll = track.scrollLeft;
-        let closestIndex = 0;
-        let minDiff = Infinity;
-
-        cards.forEach((card, idx) => {
-          const cardLeft = card.offsetLeft - track.offsetLeft;
-          const diff = Math.abs(cardLeft - currentScroll);
-          if (diff < minDiff) {
-            minDiff = diff;
-            closestIndex = idx;
-          }
-        });
-
-        goToCard(closestIndex, true);
-      }
-    }
-
-    window.addEventListener('mouseup', finishDrag);
-    track.addEventListener('mouseleave', finishDrag);
-
-    track.addEventListener('mousemove', (e) => {
-      if (!isDown) return;
-      e.preventDefault();
-      hasDragged = true;
-      const x = e.pageX - track.offsetLeft;
-      const walk = (x - startX) * 1.35;
-      track.scrollLeft = scrollLeftPos - walk;
-    });
+    // Passive scroll listener to update active index and counter smoothly
+    // Vertical scrolling passes through 100% naturally without getting blocked!
 
     // Horizontal wheel / trackpad swipe handling:
     // Only intercepts when user is intentionally scrolling horizontally (Shift + Wheel or trackpad deltaX)
