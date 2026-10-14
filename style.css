@@ -2105,52 +2105,6 @@ body {
 }
 
 /* ==========================================================================
-   REALTIME SCRUB INDICATOR PILL (BOTTOM RIGHT)
-   ========================================================================== */
-.scrub-status-pill {
-  position: fixed;
-  bottom: 24px;
-  right: 28px;
-  z-index: 90;
-  background: rgba(14, 13, 17, 0.8);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 8px 16px;
-  border-radius: 999px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-  pointer-events: none;
-}
-
-.scrub-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background-color: var(--accent-orange);
-  box-shadow: 0 0 8px var(--accent-orange);
-}
-
-.scrub-label {
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  color: var(--text-muted);
-}
-
-.scrub-number {
-  font-family: 'SF Mono', Monaco, Consolas, monospace;
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 2px 8px;
-  border-radius: 999px;
-}
-
-/* ==========================================================================
    RESPONSIVE DESIGN (LAPTOPS, TABLETS & SMARTPHONES)
    ========================================================================== */
 @media (max-width: 1200px) {

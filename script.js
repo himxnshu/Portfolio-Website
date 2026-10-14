@@ -1,22 +1,16 @@
 (() => {
   'use strict';
 
-  // Configuration
-  const TOTAL_FRAMES = 240;
-  const FRAME_PREFIX = 'Frames/frame_';
-  const FRAME_EXTENSION = '.png';
-  const LERP_FACTOR = 0.095; // Fluid lerp factor
-
   // DOM Elements
   const canvas = document.getElementById('animation-canvas');
-  const ctx = canvas.getContext('2d', { alpha: false });
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = 'high';
+  let ctx = null;
+  if (canvas) {
+    ctx = canvas.getContext('2d');
+  }
 
   const loader = document.getElementById('loader');
   const progressFill = document.getElementById('progress-fill');
   const progressText = document.getElementById('progress-text');
-  const scrubIndicator = document.getElementById('scrub-frame-indicator');
   const globalNavbar = document.getElementById('global-navbar');
 
   // Menu Drawer Elements
@@ -26,96 +20,177 @@
   const drawerBackdrop = document.getElementById('drawer-backdrop');
   const drawerLinks = document.querySelectorAll('.d-link');
 
-  // State
-  const images = new Array(TOTAL_FRAMES);
-  let loadedCount = 0;
-  let currentFrame = 0;
-  let targetFrame = 0;
-  let lastRenderedFrame = -1;
-  let isInitialFrameRendered = false;
-  let animationFrameId = null;
+  // =========================================================================
+  // 1. Snappy Zero-Lag Preloader (Smooth 300ms Startup)
+  // =========================================================================
+  function runSnappyLoader() {
+    let progress = 0;
+    const startTime = performance.now();
+    const duration = 280; // 280ms total snappy intro
 
-  // Format frame filename with 4-digit zero-padding
-  function getFramePath(index) {
-    const padded = String(index + 1).padStart(4, '0');
-    return `${FRAME_PREFIX}${padded}${FRAME_EXTENSION}`;
-  }
+    function step(currentTime) {
+      const elapsed = currentTime - startTime;
+      progress = Math.min(100, Math.round((elapsed / duration) * 100));
 
-  // Find nearest loaded frame to prevent blank flicker
-  function getNearestLoadedFrame(targetIdx) {
-    if (images[targetIdx] && images[targetIdx].isReady) {
-      return images[targetIdx];
-    }
+      if (progressFill) progressFill.style.width = `${progress}%`;
+      if (progressText) progressText.textContent = `${progress}%`;
 
-    let minDistance = Infinity;
-    let closest = null;
-
-    for (let i = 0; i < TOTAL_FRAMES; i++) {
-      if (images[i] && images[i].isReady) {
-        const dist = Math.abs(i - targetIdx);
-        if (dist < minDistance) {
-          minDistance = dist;
-          closest = images[i];
-        }
+      if (progress < 100) {
+        requestAnimationFrame(step);
+      } else {
+        setTimeout(() => {
+          if (loader) loader.classList.add('loaded');
+        }, 120);
       }
     }
-    return closest;
+
+    requestAnimationFrame(step);
   }
 
-  // Draw image on canvas preserving cover aspect ratio
-  function renderFrame(frameIndex) {
-    const boundedIndex = Math.max(0, Math.min(TOTAL_FRAMES - 1, frameIndex));
-    const img = getNearestLoadedFrame(boundedIndex);
-    if (!img) return;
+  // =========================================================================
+  // 2. High-Performance Hardware-Accelerated Ambient Canvas
+  // =========================================================================
+  let particles = [];
+  let mouse = { x: null, y: null, targetX: null, targetY: null };
+  let scrollProgress = 0;
+  let animId = null;
 
-    const canvasW = canvas.width;
-    const canvasH = canvas.height;
-    const imgW = img.naturalWidth || 1920;
-    const imgH = img.naturalHeight || 1080;
-
-    // Cover math: scale up to fully cover canvas while keeping aspect ratio
-    const scale = Math.max(canvasW / imgW, canvasH / imgH);
-    const drawW = imgW * scale;
-    const drawH = imgH * scale;
-
-    // Centered composition
-    const drawX = (canvasW - drawW) / 2;
-    const drawY = (canvasH - drawH) / 2;
-
-    ctx.drawImage(img, 0, 0, imgW, imgH, drawX, drawY, drawW, drawH);
-    lastRenderedFrame = boundedIndex;
-  }
-
-  // Canvas resize with device pixel ratio scaling for crisp rendering
-  function handleResize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const displayW = window.innerWidth;
-    const displayH = window.innerHeight;
-
-    const pixelW = Math.round(displayW * dpr);
-    const pixelH = Math.round(displayH * dpr);
-
-    if (canvas.width !== pixelW || canvas.height !== pixelH) {
-      canvas.width = pixelW;
-      canvas.height = pixelH;
+  class AmbientParticle {
+    constructor(w, h) {
+      this.reset(w, h);
     }
 
-    // Force re-render of current frame
-    if (isInitialFrameRendered) {
-      renderFrame(Math.round(currentFrame));
+    reset(w, h) {
+      this.x = Math.random() * w;
+      this.y = Math.random() * h;
+      this.baseRadius = Math.random() * 2 + 0.8;
+      this.radius = this.baseRadius;
+      this.vx = (Math.random() - 0.5) * 0.45;
+      this.vy = (Math.random() - 0.5) * 0.45;
+      this.alpha = Math.random() * 0.45 + 0.15;
+      // Signature accents: Vibrant Orange, Warm Amber, Cyan AI glow
+      const colors = ['255, 87, 34', '255, 171, 0', '0, 210, 255', '255, 255, 255'];
+      this.color = colors[Math.floor(Math.random() * colors.length)];
+      this.pulseSpeed = Math.random() * 0.02 + 0.008;
+      this.pulseVal = Math.random() * Math.PI;
+    }
+
+    update(w, h, scrollDelta) {
+      this.x += this.vx;
+      this.y += this.vy + scrollDelta * 0.4;
+
+      this.pulseVal += this.pulseSpeed;
+      this.radius = this.baseRadius + Math.sin(this.pulseVal) * 0.6;
+
+      // Mouse subtle repulsion
+      if (mouse.x !== null && mouse.y !== null) {
+        const dx = mouse.x - this.x;
+        const dy = mouse.y - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          const force = (120 - dist) / 120;
+          this.x -= (dx / dist) * force * 1.5;
+          this.y -= (dy / dist) * force * 1.5;
+        }
+      }
+
+      // Wrap edges
+      if (this.x < 0) this.x = w;
+      if (this.x > w) this.x = 0;
+      if (this.y < 0) this.y = h;
+      if (this.y > h) this.y = 0;
+    }
+
+    draw(ctx) {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, Math.max(0.2, this.radius), 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${this.color}, ${this.alpha})`;
+      ctx.shadowColor = `rgba(${this.color}, 0.5)`;
+      ctx.shadowBlur = 8;
+      ctx.fill();
+      ctx.shadowBlur = 0;
     }
   }
 
-  // Update target frame and navbar state based on window scroll
+  function initAmbientCanvas() {
+    if (!canvas || !ctx) return;
+
+    function resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      ctx.scale(dpr, dpr);
+
+      // Populate particles
+      const count = window.innerWidth < 768 ? 28 : 55;
+      particles = [];
+      for (let i = 0; i < count; i++) {
+        particles.push(new AmbientParticle(window.innerWidth, window.innerHeight));
+      }
+    }
+
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    }, { passive: true });
+
+    window.addEventListener('mouseleave', () => {
+      mouse.x = null;
+      mouse.y = null;
+    });
+
+    let lastScrollY = window.scrollY || 0;
+    let scrollDelta = 0;
+
+    function renderLoop() {
+      const currentScrollY = window.scrollY || 0;
+      scrollDelta = (currentScrollY - lastScrollY) * 0.15;
+      lastScrollY = currentScrollY;
+
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      // Draw faint interconnecting constellation lines
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 110) {
+            const lineAlpha = (1 - dist / 110) * 0.12;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(255, 87, 34, ${lineAlpha})`;
+            ctx.lineWidth = 0.75;
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw particles
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update(w, h, scrollDelta);
+        particles[i].draw(ctx);
+      }
+
+      animId = requestAnimationFrame(renderLoop);
+    }
+
+    renderLoop();
+  }
+
+  // =========================================================================
+  // 3. Scroll & Navbar States
+  // =========================================================================
   function updateScroll() {
-    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    if (maxScroll > 0) {
-      const scrollY = Math.max(0, Math.min(maxScroll, window.scrollY || window.pageYOffset));
-      const progress = scrollY / maxScroll;
-      targetFrame = progress * (TOTAL_FRAMES - 1);
-    }
-
-    // Navbar background blur toggle on scroll
     if (globalNavbar) {
       if (window.scrollY > 40) {
         globalNavbar.classList.add('scrolled');
@@ -125,73 +200,9 @@
     }
   }
 
-  // Main animation render loop using lerp (Linear Interpolation)
-  function animationLoop() {
-    const diff = targetFrame - currentFrame;
-
-    if (Math.abs(diff) > 0.0005) {
-      currentFrame += diff * LERP_FACTOR;
-    } else {
-      currentFrame = targetFrame;
-    }
-
-    const frameToRender = Math.round(currentFrame);
-    if (frameToRender !== lastRenderedFrame) {
-      renderFrame(frameToRender);
-
-      // Update frame indicator pill
-      if (scrubIndicator) {
-        const paddedFrame = String(frameToRender + 1).padStart(3, '0');
-        scrubIndicator.textContent = `${paddedFrame} / ${TOTAL_FRAMES}`;
-      }
-    }
-
-    animationFrameId = requestAnimationFrame(animationLoop);
-  }
-
-  // Update loader UI and check if preloading is complete
-  function onFrameLoad(index, img) {
-    img.isReady = true;
-    loadedCount++;
-
-    const percent = Math.floor((loadedCount / TOTAL_FRAMES) * 100);
-    if (progressFill) progressFill.style.width = `${percent}%`;
-    if (progressText) progressText.textContent = `${percent}%`;
-
-    // Render frame 0 immediately when loaded so user never sees a black box
-    if (!isInitialFrameRendered && (index === 0 || loadedCount >= 1)) {
-      renderFrame(0);
-      isInitialFrameRendered = true;
-    }
-
-    // Dismiss loader once all frames are loaded
-    if (loadedCount >= TOTAL_FRAMES) {
-      setTimeout(() => {
-        if (loader) loader.classList.add('loaded');
-      }, 250);
-    }
-  }
-
-  // Preload all frames concurrently with error resilience
-  function preloadFrames() {
-    // 1. High priority: Load first frame immediately
-    const firstImg = new Image();
-    images[0] = firstImg;
-    firstImg.onload = () => onFrameLoad(0, firstImg);
-    firstImg.onerror = () => onFrameLoad(0, firstImg);
-    firstImg.src = getFramePath(0);
-
-    // 2. Load the rest of the frames
-    for (let i = 1; i < TOTAL_FRAMES; i++) {
-      const img = new Image();
-      images[i] = img;
-      img.onload = () => onFrameLoad(i, img);
-      img.onerror = () => onFrameLoad(i, img);
-      img.src = getFramePath(i);
-    }
-  }
-
-  // Setup UI Interactions
+  // =========================================================================
+  // 4. Setup UI Interactions
+  // =========================================================================
   function setupInteractions() {
     // Smooth scrolling for all internal anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -232,11 +243,11 @@
       }
     });
 
-    // Active wheel listener to ensure smooth laptop touchpad scrolling
-    window.addEventListener('wheel', updateScroll, { passive: true });
+    // Active scroll listener
+    window.addEventListener('scroll', updateScroll, { passive: true });
 
     // =========================================================================
-    // Sideways Projects Carousel Interactions
+    // 5. Sideways Projects Carousel Interactions
     // =========================================================================
     const projectsTrack = document.getElementById('projects-track');
     const projectsPrevBtn = document.getElementById('projects-prev-btn');
@@ -327,18 +338,16 @@
     }
   }
 
-  // Initialize
+  // =========================================================================
+  // 6. Application Initialization
+  // =========================================================================
   function init() {
-    handleResize();
-    window.addEventListener('resize', handleResize, { passive: true });
-    window.addEventListener('scroll', updateScroll, { passive: true });
-
+    runSnappyLoader();
+    initAmbientCanvas();
     setupInteractions();
-    preloadFrames();
-    animationLoop();
+    updateScroll();
   }
 
-  // Run on DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
