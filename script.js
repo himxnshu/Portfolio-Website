@@ -116,6 +116,7 @@
       const scrollY = Math.max(0, Math.min(maxScroll, window.scrollY || window.pageYOffset));
       const progress = scrollY / maxScroll;
       targetFrame = progress * (TOTAL_FRAMES - 1);
+      fetchNearbyFrames(targetFrame);
     }
 
     if (globalNavbar) {
@@ -144,77 +145,108 @@
     requestAnimationFrame(animationLoop);
   }
 
-  // Dismiss loader cleanly
+  // Dismiss loader cleanly and eliminate it from the DOM layout tree
   function unlockPage() {
     if (isPageUnlocked) return;
     isPageUnlocked = true;
     if (progressFill) progressFill.style.width = '100%';
     if (progressText) progressText.textContent = '100%';
     setTimeout(() => {
-      if (loader) loader.classList.add('loaded');
-    }, 180);
+      if (loader) {
+        loader.classList.add('loaded');
+        setTimeout(() => {
+          loader.style.display = 'none';
+        }, 650);
+      }
+    }, 120);
   }
 
-  // Preload frames progressively so initial view loads immediately without freezing
-  function preloadFrames() {
-    // 1. High priority: Load frame 0 immediately and display it
-    const firstImg = new Image();
-    firstImg.onload = () => {
-      firstImg.isReady = true;
-      images[0] = firstImg;
+  // Snappy startup loader: smooth 250ms progress animation so user is never staring at a frozen 0% screen
+  function startLoaderAnimation() {
+    const startTime = performance.now();
+    const duration = 260; // 260ms smooth progress
+
+    function tick(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(100, Math.round((elapsed / duration) * 100));
+
+      if (progressFill) progressFill.style.width = `${progress}%`;
+      if (progressText) progressText.textContent = `${progress}%`;
+
+      if (progress < 100 && !isPageUnlocked) {
+        requestAnimationFrame(tick);
+      } else {
+        unlockPage();
+      }
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  // Track state of frames (0 = unrequested, 1 = pending, 2 = loaded)
+  const frameLoadStatus = new Uint8Array(TOTAL_FRAMES);
+
+  function requestFrame(index) {
+    const idx = Math.max(0, Math.min(TOTAL_FRAMES - 1, index));
+    if (frameLoadStatus[idx] !== 0) return;
+    frameLoadStatus[idx] = 1;
+
+    const img = new Image();
+    img.onload = () => {
+      img.isReady = true;
+      images[idx] = img;
+      frameLoadStatus[idx] = 2;
       loadedCount++;
-      renderFrame(0);
-      isInitialFrameRendered = true;
-      unlockPage(); // Instantly show page once first frame is ready!
+      if (idx === 0 && !isInitialFrameRendered) {
+        isInitialFrameRendered = true;
+        renderFrame(0);
+      }
     };
-    firstImg.onerror = () => {
-      unlockPage();
+    img.onerror = () => {
+      frameLoadStatus[idx] = 0; // Allow retry on failure
     };
-    firstImg.src = getFramePath(0);
+    img.src = getFramePath(idx);
+  }
 
-    // Fallback timer ensures page is unlocked within 400ms max
-    setTimeout(() => unlockPage(), 400);
+  // On-demand fetch around user's active scrub position
+  function fetchNearbyFrames(targetIdx) {
+    const center = Math.round(targetIdx);
+    for (let offset = -3; offset <= 3; offset++) {
+      const idx = center + offset;
+      if (idx >= 0 && idx < TOTAL_FRAMES) {
+        requestFrame(idx);
+      }
+    }
+  }
 
-    // 2. Load keyframes first (every 4th frame) to give instant responsive scrub across entire scroll
+  // Preload keyframes progressively so the network queue and browser tab are NEVER overloaded
+  function preloadFrames() {
+    // 1. Immediately request initial frame 0 for instant visual display
+    requestFrame(0);
+
+    // 2. Fetch a compact, spaced set of keyframes (1 every 8 frames = ~30 frames across full scroll)
+    // Distributed sequentially during idle so browser tab spinner stops in under 1 second!
     const keyframeIndices = [];
-    for (let i = 4; i < TOTAL_FRAMES; i += 4) {
+    for (let i = 8; i < TOTAL_FRAMES; i += 8) {
       keyframeIndices.push(i);
     }
-    // Then fill in the rest
-    for (let i = 1; i < TOTAL_FRAMES; i++) {
-      if (i % 4 !== 0) keyframeIndices.push(i);
-    }
 
-    // Load sequentially in small batches to preserve network and CPU
-    let batchIndex = 0;
-    const BATCH_SIZE = 6;
-
-    function loadNextBatch() {
-      if (batchIndex >= keyframeIndices.length) return;
-      const end = Math.min(batchIndex + BATCH_SIZE, keyframeIndices.length);
-
-      for (let k = batchIndex; k < end; k++) {
-        const frameIdx = keyframeIndices[k];
-        const img = new Image();
-        img.onload = () => {
-          img.isReady = true;
-          images[frameIdx] = img;
-          loadedCount++;
-        };
-        img.onerror = () => {
-          loadedCount++;
-        };
-        img.src = getFramePath(frameIdx);
-      }
-
-      batchIndex = end;
-      if (batchIndex < keyframeIndices.length) {
-        setTimeout(loadNextBatch, 25);
+    let kIdx = 0;
+    function loadNextKeyframe() {
+      if (kIdx >= keyframeIndices.length) return;
+      requestFrame(keyframeIndices[kIdx]);
+      kIdx++;
+      if (kIdx < keyframeIndices.length) {
+        if ('requestIdleCallback' in window) {
+          window.requestIdleCallback(() => setTimeout(loadNextKeyframe, 35), { timeout: 800 });
+        } else {
+          setTimeout(loadNextKeyframe, 45);
+        }
       }
     }
 
-    // Start background loading
-    setTimeout(loadNextBatch, 50);
+    // Start gentle background prefetch after initial frame load
+    setTimeout(loadNextKeyframe, 250);
   }
 
   // =========================================================================
@@ -378,9 +410,15 @@
     handleResize();
     window.addEventListener('resize', handleResize, { passive: true });
 
+    startLoaderAnimation();
     preloadFrames();
     setupInteractions();
     animationLoop();
+
+    // Absolute failsafe: guarantees page is unlocked in <= 400ms under any condition
+    setTimeout(() => {
+      if (!isPageUnlocked) unlockPage();
+    }, 400);
   }
 
   if (document.readyState === 'loading') {

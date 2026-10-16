@@ -1408,6 +1408,12 @@ body {
   text-transform: uppercase;
 }
 
+.p-type-badge.highlight-data {
+  background: rgba(16, 185, 129, 0.16);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #34d399;
+}
+
 .p-type-badge.highlight-web {
   background: rgba(255, 171, 0, 0.15);
   border-color: rgba(255, 171, 0, 0.4);
@@ -1458,6 +1464,35 @@ body {
   color: #7ce7ff;
   padding: 3px 10px;
   border-radius: 999px;
+}
+
+.project-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.live-portal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 8px 16px;
+  border-radius: 999px;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
+}
+
+.live-portal-btn:hover {
+  background: linear-gradient(135deg, #10b981, #34d399);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.55);
 }
 
 .github-action-btn {
@@ -2439,7 +2474,8 @@ body {
     padding: 3px 8px;
   }
 
-  .github-action-btn {
+  .github-action-btn,
+  .live-portal-btn {
     padding: 6px 14px;
     font-size: 0.74rem;
   }

@@ -4,7 +4,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Himanshu Sharma — Software Engineer & GenAI Builder</title>
+  <title>Himanshu Sharma — Software Engineer &amp; GenAI Builder</title>
+
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="Himanshu Sharma — Software Engineer &amp; GenAI Builder">
+  <meta name="description" content="Portfolio of Himanshu Sharma — Software Engineer specializing in Python, High-Performance Systems, GenAI &amp; Agentic AI. Explore projects, engineering work, and live demonstrations.">
+  <meta name="author" content="Himanshu Sharma">
+  <meta name="theme-color" content="#07070a">
+  <link rel="canonical" href="https://himxnshu.vercel.app/">
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="apple-touch-icon" href="assets/logo.png">
+
+  <!-- Open Graph / LinkedIn / Facebook Preview Tags -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://himxnshu.vercel.app/">
+  <meta property="og:title" content="Himanshu Sharma — Software Engineer &amp; GenAI Builder">
+  <meta property="og:description" content="Software Engineer specializing in Python, High-Performance Systems, GenAI &amp; Agentic AI. Explore projects, architecture, and live demonstrations.">
+  <meta property="og:image" content="https://himxnshu.vercel.app/thumbnail.png">
+  <meta property="og:image:secure_url" content="https://himxnshu.vercel.app/thumbnail.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Himanshu Sharma — Software Engineer &amp; GenAI Builder Portfolio">
+  <meta property="og:site_name" content="Himanshu Sharma Portfolio">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter / X Preview Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://himxnshu.vercel.app/">
+  <meta name="twitter:title" content="Himanshu Sharma — Software Engineer &amp; GenAI Builder">
+  <meta name="twitter:description" content="Software Engineer specializing in Python, High-Performance Systems, GenAI &amp; Agentic AI.">
+  <meta name="twitter:image" content="https://himxnshu.vercel.app/thumbnail.png">
+  <meta name="twitter:image:alt" content="Himanshu Sharma — Software Engineer &amp; GenAI Builder Portfolio">
 
   <!-- Modern Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,6 +47,21 @@
     rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
+
+  <!-- Immediate Failsafe: Guarantees loader dismisses quickly with zero infinite waiting -->
+  <script>
+    (function () {
+      function dismissLoader() {
+        var el = document.getElementById('loader');
+        if (el && !el.classList.contains('loaded')) {
+          el.classList.add('loaded');
+          setTimeout(function () { el.style.display = 'none'; }, 600);
+        }
+      }
+      window.addEventListener('load', function () { setTimeout(dismissLoader, 300); });
+      setTimeout(dismissLoader, 1200); // Absolute fallback guarantee
+    })();
+  </script>
 
   <!-- Vercel Web Analytics -->
   <script>
@@ -387,15 +435,17 @@
               <h3 class="cat-title">Databases & Architecture</h3>
             </div>
             <div class="skill-pill-wrap">
-              <span class="skill-pill highlight">MongoDB</span>
+              <span class="skill-pill highlight">SQL Data Warehousing</span>
+              <span class="skill-pill highlight">Medallion Architecture</span>
               <span class="skill-pill highlight">Relational SQL</span>
+              <span class="skill-pill highlight">MongoDB</span>
               <span class="skill-pill highlight">Multithreading</span>
               <span class="skill-pill highlight">5-Tuple Flow Tables</span>
               <span class="skill-pill highlight">Low-Level Design (LLD)</span>
               <span class="skill-pill highlight">System Design</span>
             </div>
-            <p class="cat-desc">Data modeling, concurrent producer-consumer pipelines, thread-safe hash tables, and
-              network protocol parsing.</p>
+            <p class="cat-desc">Enterprise data warehousing, multi-tier T-SQL ETL, star schema dimensional modeling,
+              concurrent producer-consumer pipelines, and thread-safe systems.</p>
           </div>
 
           <!-- Category 5: Computer Science Fundamentals -->
@@ -451,7 +501,7 @@
 
           <!-- Sideways Carousel Navigation Controls -->
           <div class="carousel-control-group">
-            <span class="carousel-indicator-pill" id="projects-counter">01 / 06</span>
+            <span class="carousel-indicator-pill" id="projects-counter">01 / 07</span>
             <div class="carousel-arrow-buttons">
               <button class="carousel-arrow-btn" id="projects-prev-btn" aria-label="Previous project">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
@@ -471,19 +521,21 @@
         <div class="projects-carousel-wrapper">
           <div class="projects-carousel-track" id="projects-track" tabindex="0" role="region" aria-label="Projects Carousel">
 
-            <!-- Card 1: Deep Packet Inspection Engine (Pinned) -->
+            <!-- Card 1: Deep Packet Inspection Engine (Top 3) -->
             <article class="project-carousel-card">
               <div class="project-card-header">
                 <div class="project-meta-badges">
                   <span class="p-type-badge">NETWORK SYSTEMS</span>
                 </div>
-                <a href="https://github.com/himxnshu/Deep-Packet-Inspection-Engine" target="_blank" rel="noopener noreferrer"
-                  class="github-action-btn" title="View Source on GitHub">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-                  </svg>
-                  <span>GitHub ↗</span>
-                </a>
+                <div class="project-card-actions">
+                  <a href="https://github.com/himxnshu/Deep-Packet-Inspection-Engine" target="_blank" rel="noopener noreferrer"
+                    class="github-action-btn" title="View Source on GitHub">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    <span>GitHub ↗</span>
+                  </a>
+                </div>
               </div>
 
               <h3 class="project-title">Deep Packet Inspection Engine</h3>
@@ -523,70 +575,83 @@
               </div>
             </article>
 
-            <!-- Card 2: Portfolio Website (Pinned) -->
+            <!-- Card 2: Enterprise SQL Data Warehouse & Analytics Platform (Top 3) -->
             <article class="project-carousel-card">
               <div class="project-card-header">
                 <div class="project-meta-badges">
-                  <span class="p-type-badge highlight-web">CREATIVE WEB & MOTION</span>
+                  <span class="p-type-badge highlight-data">DATA ENGINEERING &amp; DWH</span>
                 </div>
-                <a href="https://github.com/himxnshu/Portfolio-Website" target="_blank" rel="noopener noreferrer"
-                  class="github-action-btn" title="View Source on GitHub">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-                  </svg>
-                  <span>GitHub ↗</span>
-                </a>
+                <div class="project-card-actions">
+                  <a href="https://sql-dwh.vercel.app" target="_blank" rel="noopener noreferrer"
+                    class="live-portal-btn" title="Launch Executive Analytics Portal">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    <span>Live Portal ↗</span>
+                  </a>
+                  <a href="https://github.com/himxnshu/sql-data-warehouse-project" target="_blank" rel="noopener noreferrer"
+                    class="github-action-btn" title="View Source on GitHub">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    <span>GitHub ↗</span>
+                  </a>
+                </div>
               </div>
 
-              <h3 class="project-title">Interactive Portfolio Website</h3>
+              <h3 class="project-title">Enterprise Sales SQL Data Warehouse</h3>
               <p class="project-summary">
-                A modern personal portfolio built with native HTML5, Vanilla CSS, and JavaScript featuring a 240-frame scroll-synchronized background canvas sequence.
+                An end-to-end data warehousing and business intelligence solution built on SQL Server using the Medallion Architecture (Bronze/Silver/Gold), upgraded with an automated Python ETL runner, FastAPI REST service, and an Executive Analytics Portal.
               </p>
 
               <div class="project-bullet-grid">
                 <div class="bullet-item">
                   <span class="bullet-dot"></span>
-                  <span><strong>240-Frame Canvas Engine:</strong> Renders preloaded frames dynamically with requestAnimationFrame and linear interpolation (lerp).</span>
+                  <span><strong>Medallion Architecture:</strong> Multi-tier T-SQL stored procedures with high-throughput BULK INSERT (TABLOCK) and immutable landing tables.</span>
                 </div>
                 <div class="bullet-item">
                   <span class="bullet-dot"></span>
-                  <span><strong>Native Scroll Architecture:</strong> Standard 100% smooth document flow tailored for laptop trackpads and precision mouse wheels.</span>
+                  <span><strong>Quality &amp; Conformance (Silver):</strong> Deduplication with windowed partitioning, CRM/ERP key normalization, and SCD Type 2 historization computed via LEAD().</span>
                 </div>
                 <div class="bullet-item">
                   <span class="bullet-dot"></span>
-                  <span><strong>Dark Editorial Aesthetics:</strong> Rich glassmorphism, responsive typography, and customized interactive badges.</span>
+                  <span><strong>Star Schema &amp; Modeling (Gold):</strong> Analytical business views featuring normalized dimensions (dim_customers, dim_products) and joined transaction facts (fact_sales).</span>
                 </div>
                 <div class="bullet-item">
                   <span class="bullet-dot"></span>
-                  <span><strong>Asset Optimization:</strong> High-DPI canvas scaling, offline PDF resume distribution, and zero-framework performance.</span>
+                  <span><strong>FastAPI REST Gateway &amp; Portal:</strong> Production REST service with parameterized T-SQL, pyodbc pooling, and a live Executive Analytics Portal with KPI metrics.</span>
                 </div>
               </div>
 
               <div class="project-footer-block">
                 <div class="project-tech-tags">
-                  <span class="t-tag highlight">HTML5</span>
-                  <span class="t-tag highlight">Vanilla CSS</span>
-                  <span class="t-tag highlight">JavaScript (ES6+)</span>
-                  <span class="t-tag">HTML5 Canvas</span>
-                  <span class="t-tag">Web Animations</span>
-                  <span class="t-tag">Responsive Design</span>
+                  <span class="t-tag highlight">SQL Server</span>
+                  <span class="t-tag highlight">T-SQL Stored Procs</span>
+                  <span class="t-tag highlight">Medallion Architecture</span>
+                  <span class="t-tag highlight">FastAPI</span>
+                  <span class="t-tag">Python ETL</span>
+                  <span class="t-tag">Star Schema</span>
+                  <span class="t-tag">Streamlit</span>
+                  <span class="t-tag">pyodbc</span>
                 </div>
               </div>
             </article>
 
-            <!-- Card 3: AI LinkedIn Post Generator (Featured Build) -->
+            <!-- Card 3: AI LinkedIn Post Generator (Top 3) -->
             <article class="project-carousel-card">
               <div class="project-card-header">
                 <div class="project-meta-badges">
                   <span class="p-type-badge highlight-genai">GENERATIVE AI & AGENTS</span>
                 </div>
-                <a href="https://github.com/himxnshu" target="_blank" rel="noopener noreferrer"
-                  class="github-action-btn" title="View Source on GitHub">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-                  </svg>
-                  <span>GitHub ↗</span>
-                </a>
+                <div class="project-card-actions">
+                  <a href="https://github.com/himxnshu" target="_blank" rel="noopener noreferrer"
+                    class="github-action-btn" title="View Source on GitHub">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    <span>GitHub ↗</span>
+                  </a>
+                </div>
               </div>
 
               <h3 class="project-title">AI LinkedIn Post Generator</h3>
@@ -625,19 +690,74 @@
               </div>
             </article>
 
-            <!-- Card 4: Simon-Game (Pinned) -->
+            <!-- Card 4: Interactive Portfolio Website -->
+            <article class="project-carousel-card">
+              <div class="project-card-header">
+                <div class="project-meta-badges">
+                  <span class="p-type-badge highlight-web">CREATIVE WEB & MOTION</span>
+                </div>
+                <div class="project-card-actions">
+                  <a href="https://github.com/himxnshu/Portfolio-Website" target="_blank" rel="noopener noreferrer"
+                    class="github-action-btn" title="View Source on GitHub">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    <span>GitHub ↗</span>
+                  </a>
+                </div>
+              </div>
+
+              <h3 class="project-title">Interactive Portfolio Website</h3>
+              <p class="project-summary">
+                A modern personal portfolio built with native HTML5, Vanilla CSS, and JavaScript featuring a 240-frame scroll-synchronized background canvas sequence.
+              </p>
+
+              <div class="project-bullet-grid">
+                <div class="bullet-item">
+                  <span class="bullet-dot"></span>
+                  <span><strong>240-Frame Canvas Engine:</strong> Renders preloaded frames dynamically with requestAnimationFrame and linear interpolation (lerp).</span>
+                </div>
+                <div class="bullet-item">
+                  <span class="bullet-dot"></span>
+                  <span><strong>Native Scroll Architecture:</strong> Standard 100% smooth document flow tailored for laptop trackpads and precision mouse wheels.</span>
+                </div>
+                <div class="bullet-item">
+                  <span class="bullet-dot"></span>
+                  <span><strong>Dark Editorial Aesthetics:</strong> Rich glassmorphism, responsive typography, and customized interactive badges.</span>
+                </div>
+                <div class="bullet-item">
+                  <span class="bullet-dot"></span>
+                  <span><strong>Asset Optimization:</strong> High-DPI canvas scaling, offline PDF resume distribution, and zero-framework performance.</span>
+                </div>
+              </div>
+
+              <div class="project-footer-block">
+                <div class="project-tech-tags">
+                  <span class="t-tag highlight">HTML5</span>
+                  <span class="t-tag highlight">Vanilla CSS</span>
+                  <span class="t-tag highlight">JavaScript (ES6+)</span>
+                  <span class="t-tag">HTML5 Canvas</span>
+                  <span class="t-tag">Web Animations</span>
+                  <span class="t-tag">Responsive Design</span>
+                </div>
+              </div>
+            </article>
+
+            <!-- Card 5: Simon Challenge Game -->
             <article class="project-carousel-card">
               <div class="project-card-header">
                 <div class="project-meta-badges">
                   <span class="p-type-badge highlight-game">INTERACTIVE GAME</span>
                 </div>
-                <a href="https://github.com/himxnshu/Simon-Game" target="_blank" rel="noopener noreferrer"
-                  class="github-action-btn" title="View Source on GitHub">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-                  </svg>
-                  <span>GitHub ↗</span>
-                </a>
+                <div class="project-card-actions">
+                  <a href="https://github.com/himxnshu/Simon-Game" target="_blank" rel="noopener noreferrer"
+                    class="github-action-btn" title="View Source on GitHub">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    <span>GitHub ↗</span>
+                  </a>
+                </div>
               </div>
 
               <h3 class="project-title">Simon Challenge Game</h3>
@@ -676,19 +796,21 @@
               </div>
             </article>
 
-            <!-- Card 5: Drum-kit (Pinned) -->
+            <!-- Card 6: Drum-kit -->
             <article class="project-carousel-card">
               <div class="project-card-header">
                 <div class="project-meta-badges">
                   <span class="p-type-badge highlight-audio">AUDIO & EVENTS</span>
                 </div>
-                <a href="https://github.com/himxnshu/Drum-kit" target="_blank" rel="noopener noreferrer"
-                  class="github-action-btn" title="View Source on GitHub">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-                  </svg>
-                  <span>GitHub ↗</span>
-                </a>
+                <div class="project-card-actions">
+                  <a href="https://github.com/himxnshu/Drum-kit" target="_blank" rel="noopener noreferrer"
+                    class="github-action-btn" title="View Source on GitHub">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    <span>GitHub ↗</span>
+                  </a>
+                </div>
               </div>
 
               <h3 class="project-title">Virtual Musical Drum Kit</h3>
@@ -726,19 +848,21 @@
               </div>
             </article>
 
-            <!-- Card 6: Dice-game (Pinned) -->
+            <!-- Card 7: Dice-game -->
             <article class="project-carousel-card">
               <div class="project-card-header">
                 <div class="project-meta-badges">
                   <span class="p-type-badge highlight-algo">ALGORITHMIC LOGIC</span>
                 </div>
-                <a href="https://github.com/himxnshu/Dice-game" target="_blank" rel="noopener noreferrer"
-                  class="github-action-btn" title="View Source on GitHub">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-                  </svg>
-                  <span>GitHub ↗</span>
-                </a>
+                <div class="project-card-actions">
+                  <a href="https://github.com/himxnshu/Dice-game" target="_blank" rel="noopener noreferrer"
+                    class="github-action-btn" title="View Source on GitHub">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    <span>GitHub ↗</span>
+                  </a>
+                </div>
               </div>
 
               <h3 class="project-title">2-Player Interactive Dice Battle</h3>
