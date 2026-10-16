@@ -19,8 +19,9 @@ An interactive, high-performance personal portfolio website built with native HT
 - **Responsive Layout**: Tailored for high-DPI displays, laptops, tablets, and smartphones.
 - **Editorial Hero Section**: Custom insignia branding, headline typography, and direct resume download.
 - **Detailed Experience & Project Showcases**:
-  - Deep Packet Inspection (DPI) Engine in Python & C++17
-  - AI-Powered LinkedIn Post Generator using LangChain, LLaMA 3.2, Groq Cloud & Streamlit
+  - Deep Packet Inspection (DPI) Engine in Python & C++17 ([Live Streamlit App](https://dpi-engine-project.streamlit.app/))
+  - Enterprise Sales SQL Data Warehouse & Analytics Platform ([Live Analytics Portal](https://sql-dwh.vercel.app))
+  - AI-Powered LinkedIn Post Generator using LangChain, LLaMA 3.2, Groq Cloud & Streamlit ([Live Generator App](https://lpg-project.streamlit.app/))
 - **Skills Matrix & Certifications**: Categorized technical capabilities and verified credentials.
 - **Community Impact**: Dedicated volunteering section highlighting grassroots initiatives.
 
