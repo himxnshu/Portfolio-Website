@@ -109,6 +109,15 @@
     }
   }
 
+  // Debounced scroll frame fetcher to prevent flooding the network queue
+  let scrollFetchTimer = null;
+  function scheduleFetchNearby(targetIdx) {
+    clearTimeout(scrollFetchTimer);
+    scrollFetchTimer = setTimeout(() => {
+      fetchNearbyFrames(targetIdx);
+    }, 60);
+  }
+
   // Update target frame and navbar state based on window scroll
   function updateScroll() {
     const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
@@ -116,7 +125,7 @@
       const scrollY = Math.max(0, Math.min(maxScroll, window.scrollY || window.pageYOffset));
       const progress = scrollY / maxScroll;
       targetFrame = progress * (TOTAL_FRAMES - 1);
-      fetchNearbyFrames(targetFrame);
+      scheduleFetchNearby(targetFrame);
     }
 
     if (globalNavbar) {
@@ -149,6 +158,9 @@
   function unlockPage() {
     if (isPageUnlocked) return;
     isPageUnlocked = true;
+    if (typeof window.__dismissPortfolioLoader === 'function') {
+      window.__dismissPortfolioLoader();
+    }
     if (progressFill) progressFill.style.width = '100%';
     if (progressText) progressText.textContent = '100%';
     setTimeout(() => {
@@ -156,15 +168,15 @@
         loader.classList.add('loaded');
         setTimeout(() => {
           loader.style.display = 'none';
-        }, 650);
+        }, 350);
       }
-    }, 120);
+    }, 80);
   }
 
-  // Snappy startup loader: smooth 250ms progress animation so user is never staring at a frozen 0% screen
+  // Snappy startup loader: smooth 180ms progress animation
   function startLoaderAnimation() {
     const startTime = performance.now();
-    const duration = 260; // 260ms smooth progress
+    const duration = 180;
 
     function tick(now) {
       const elapsed = now - startTime;
@@ -208,10 +220,10 @@
     img.src = getFramePath(idx);
   }
 
-  // On-demand fetch around user's active scrub position
+  // On-demand fetch around user's active scrub position (focused range to preserve bandwidth)
   function fetchNearbyFrames(targetIdx) {
     const center = Math.round(targetIdx);
-    for (let offset = -3; offset <= 3; offset++) {
+    for (let offset = -2; offset <= 2; offset++) {
       const idx = center + offset;
       if (idx >= 0 && idx < TOTAL_FRAMES) {
         requestFrame(idx);
@@ -219,34 +231,37 @@
     }
   }
 
-  // Preload keyframes progressively so the network queue and browser tab are NEVER overloaded
+  // Light, non-blocking frame prefetcher that NEVER delays initial page load or tab spinner
   function preloadFrames() {
     // 1. Immediately request initial frame 0 for instant visual display
     requestFrame(0);
 
-    // 2. Fetch a compact, spaced set of keyframes (1 every 8 frames = ~30 frames across full scroll)
-    // Distributed sequentially during idle so browser tab spinner stops in under 1 second!
-    const keyframeIndices = [];
-    for (let i = 8; i < TOTAL_FRAMES; i += 8) {
-      keyframeIndices.push(i);
-    }
+    // 2. Fetch spaced milestone keyframes ONLY after initial page load is fully settled
+    // This guarantees the browser tab loading spinner stops in < 1 second!
+    const milestoneIndices = [30, 60, 90, 120, 150, 180, 210, 239];
+    let mIdx = 0;
 
-    let kIdx = 0;
-    function loadNextKeyframe() {
-      if (kIdx >= keyframeIndices.length) return;
-      requestFrame(keyframeIndices[kIdx]);
-      kIdx++;
-      if (kIdx < keyframeIndices.length) {
+    function loadNextMilestone() {
+      if (mIdx >= milestoneIndices.length) return;
+      requestFrame(milestoneIndices[mIdx]);
+      mIdx++;
+      if (mIdx < milestoneIndices.length) {
         if ('requestIdleCallback' in window) {
-          window.requestIdleCallback(() => setTimeout(loadNextKeyframe, 35), { timeout: 800 });
+          window.requestIdleCallback(() => setTimeout(loadNextMilestone, 250), { timeout: 1500 });
         } else {
-          setTimeout(loadNextKeyframe, 45);
+          setTimeout(loadNextMilestone, 300);
         }
       }
     }
 
-    // Start gentle background prefetch after initial frame load
-    setTimeout(loadNextKeyframe, 250);
+    // Defer milestone prefetching until after initial page load is completely settled
+    if (document.readyState === 'complete') {
+      setTimeout(loadNextMilestone, 1500);
+    } else {
+      window.addEventListener('load', () => {
+        setTimeout(loadNextMilestone, 1500);
+      }, { once: true });
+    }
   }
 
   // =========================================================================
@@ -415,10 +430,10 @@
     setupInteractions();
     animationLoop();
 
-    // Absolute failsafe: guarantees page is unlocked in <= 400ms under any condition
+    // Absolute failsafe: guarantees page is unlocked in <= 250ms under any condition
     setTimeout(() => {
       if (!isPageUnlocked) unlockPage();
-    }, 400);
+    }, 250);
   }
 
   if (document.readyState === 'loading') {
